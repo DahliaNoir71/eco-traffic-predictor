@@ -1,0 +1,60 @@
+# Main configuration file for pre-commit hooks
+# This file defines which hooks will run automatically before each commit
+# to ensure code quality and consistency across the project.
+
+repos:
+  # ===================================================
+  # Basic pre-commit hooks for general code quality
+  # ===================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0  # Pinned version for reproducibility
+    hooks:
+      # Removes trailing whitespace and ensures files end with a newline
+      - id: trailing-whitespace
+        files: ^src/  # Only check files in the src/ directory
+      - id: end-of-file-fixer
+        files: ^src/
+
+      # Validates various file formats
+      - id: check-yaml     # Checks YAML files for syntax errors
+      - id: check-toml     # Checks TOML files for syntax errors
+      - id: check-json     # Checks JSON files for syntax errors
+
+      # Prevents accidental commits of merge conflict markers
+      - id: check-merge-conflict
+
+      # Prevents committing large files (>500KB by default)
+      - id: check-added-large-files
+
+      # Detects and prevents accidental debug statements (pdb, ipdb, etc.)
+      - id: debug-statements
+        files: ^src/
+
+  # ===================================================
+  # Ruff - The extremely fast Python linter and formatter
+  # ===================================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.5  # Pinned version for reproducibility
+    hooks:
+      # Main linter and auto-formatter
+      - id: ruff
+        # --fix: Attempts to automatically fix issues
+        # --exit-non-zero-on-fix: Fails if any fixes were made, forcing a re-commit
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^src/.*\.py$  # Only check Python files in src/
+
+      # Code formatter (enforces consistent code style)
+      - id: ruff-format
+        files: ^src/.*\.py$  # Only format Python files in src/
+
+  # ===================================================
+  # Vulture - Dead code detection
+  # ===================================================
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.14  # Pinned version for reproducibility
+    hooks:
+      - id: vulture
+        # Only reports issues with at least 80% confidence
+        # Scans all Python files in src/ directory
+        args: [--min-confidence, "80", "src/"]
+        files: ^src/.*\.py$  # Only check Python files in src/
